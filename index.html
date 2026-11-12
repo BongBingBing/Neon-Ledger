@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Neon Ledger</title>
+  <meta name="description" content="Neon Ledger: a cyberpunk shopkeeper sim. Every deal leaves a mark.">
+  <meta name="theme-color" content="#0a0614">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Neon Ledger">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="modulepreload" href="src/main.js">
+</head>
+<body>
+  <div id="app" role="application" aria-label="Neon Ledger">
+    <div style="display:grid;place-items:center;height:100%;font-family:ui-monospace,Menlo,monospace;color:#ff3fd8;letter-spacing:.2em">NEON LEDGER…</div>
+  </div>
+  <noscript><p style="color:#fff;padding:20px">Neon Ledger needs JavaScript.</p></noscript>
+  <script type="module" src="src/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      addEventListener('load', function () { navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(function () {}); });
+    }
+  </script>
+</body>
+</html>

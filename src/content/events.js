@@ -97,7 +97,7 @@ const RAW = [
     feedText: {
       forecast: 'LEASEHOLD: Exciting news! A market adjustment is coming to your lease soon! :)',
       start: 'LEASEHOLD: Your next lease payment has been adjusted by +10%! Thank you for growing with us! :)',
-      end: '',
+      end: 'LEASEHOLD: The adjustment is complete! Your new rent is here to stay! :)',
     },
   },
   {
@@ -107,7 +107,7 @@ const RAW = [
     feedText: {
       forecast: 'Meridian Liquidations: the auction drone visits tomorrow with sealed lots.',
       start: 'SUNDAY. A white drone hums down the stairwell, crates swinging beneath it.',
-      end: '',
+      end: 'The auction drone lifts away up the stairwell shaft, lighter than it came.',
     },
   },
 

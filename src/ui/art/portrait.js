@@ -16,6 +16,7 @@ function rng(seed) {
   };
 }
 const pickR = (r, arr) => arr[Math.floor(r() * arr.length)];
+const pickOr = (r, v, arr) => { const x = pickR(r, arr); return v || x; }; // always consume r for stable sequences
 
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function rgbToHex(r, g, b) { return '#' + [r, g, b].map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
@@ -40,16 +41,52 @@ const FACTION_STYLE = {
 };
 
 /** Resolve the look from seed + traits. Exported so tests/dev tools can inspect determinism. */
+const kw = (str, table) => { const v = String(str || '').toLowerCase(); for (const [k, out] of table) if (v.includes(k)) return out; return null; };
+const HAIR_KW = [['bald', 'bald'], ['shav', 'bald'], ['crop', 'buzz'], ['buzz', 'buzz'], ['mohawk', 'mohawk'], ['crest', 'mohawk'], ['bun', 'topknot'], ['knot', 'topknot'], ['long', 'long'], ['bob', 'bob'], ['spik', 'spiky'], ['wild', 'curly'], ['curl', 'curly'], ['afro', 'curly'], ['side', 'sideshave'], ['undercut', 'sideshave'], ['slick', 'slick'], ['back', 'slick']];
+const HAIRC_KW = [['grey', '#9a9aa8'], ['gray', '#9a9aa8'], ['silver', '#c8c8d4'], ['white', '#e8e0d0'], ['black', '#151018'], ['brown', '#5a3a22'], ['red', '#ff6a3c'], ['blond', '#c9a15a'], ['pink', '#ff3fd8'], ['magenta', '#ff3fd8'], ['blue', '#2ef6ff'], ['cyan', '#2ef6ff'], ['green', '#b8ff3c'], ['purple', '#7a4dff']];
+const SKIN_KW = [['pale_olive', '#d8c29a'], ['olive', '#c9a878'], ['pale', '#f6d2b8'], ['pink', '#efb9a4'], ['light', '#eab48f'], ['tan', '#d39a6f'], ['warm', '#c88a5e'], ['deep', '#5c3523'], ['dark', '#3f2418'], ['brown', '#7a4a30'], ['grey', '#c8c4d6'], ['synth', '#9fb6c2'], ['chrome', '#9fb6c2']];
+const EYE_KW = [['tired', 'tired'], ['cloud', 'cyber'], ['lens', 'cyber'], ['cyber', 'cyber'], ['sharp', 'narrow'], ['narrow', 'narrow'], ['squint', 'narrow'], ['bright', 'wide'], ['wide', 'wide']];
+const IMPL_KW = [['jaw', 'jaw'], ['lens', 'none'], ['goggle', 'none'], ['cochlear', 'antenna'], ['ear', 'antenna'], ['antenna', 'antenna'], ['port', 'ports'], ['circuit', 'circuit'], ['jack', 'jack'], ['glow', 'glowlines'], ['tattoo', 'glowlines'], ['plate', 'plate'], ['none', 'none']];
+const ACC_KW = [['cap', 'cap'], ['visor', 'visor'], ['badge', 'earpiece'], ['earpiece', 'earpiece'], ['lantern', 'lanternpin'], ['chain', 'chain'], ['tat', 'necktat'], ['hood', 'hood'], ['goggle', 'goggles'], ['headlamp', 'goggles'], ['beanie', 'beanie'], ['collar', 'raincollar'], ['monocle', 'holomonocle'], ['gold', 'goldear']];
+const OUTFIT_KW = [['coat', 'coat'], ['hood', 'hoodie'], ['collar', 'collar'], ['vest', 'vest'], ['apron', 'vest'], ['wader', 'vest'], ['bomber', 'jacket'], ['jacket', 'jacket']];
+const ACC_BY_INDEX = ['none', 'beanie', 'goggles', 'chain', 'earpiece', 'holomonocle', 'raincollar', 'necktat'];
+
+/** Accept engine traits (numbers / faction ids) and content traits (descriptive strings). */
+export function normalizeTraits(raw = {}, faction = 'none') {
+  const t = {};
+  const f = raw.faction || faction;
+  if (raw.drone) t.form = 'drone';
+  if (raw.screen) t.form = 'screen';
+  if (raw.form || raw.type) t.form = raw.form || raw.type;
+  t.faction = FACTION_STYLE[f] ? f : 'none';
+  if (raw.head) t.head = ({ wide: 'round', narrow: 'long' })[raw.head] || raw.head;
+  if (raw.skin != null) t.skin = typeof raw.skin === 'number' ? SKINS[raw.skin % SKINS.length] : String(raw.skin)[0] === '#' ? raw.skin : kw(raw.skin, SKIN_KW);
+  if (raw.hair) { t.hair = kw(raw.hair, HAIR_KW); t.hairColor = raw.hairColor || kw(raw.hair, HAIRC_KW); if (String(raw.hair).includes('tattoo')) t.implant = 'circuit'; }
+  if (raw.eyes) t.eyes = kw(raw.eyes, EYE_KW) || 'normal';
+  if (raw.implant) { const im = kw(raw.implant, IMPL_KW); if (im) t.implant = im; if (/lens|cloud/.test(raw.implant)) t.eyes = 'cyber'; if (/goggle/.test(raw.implant)) t.accessory = 'goggles'; }
+  if (raw.facialHair) t.beard = !/none|clean/.test(raw.facialHair);
+  if (typeof raw.accessory === 'number') t.accessory = ACC_BY_INDEX[raw.accessory % ACC_BY_INDEX.length] === 'none' ? null : ACC_BY_INDEX[raw.accessory % ACC_BY_INDEX.length];
+  else if (raw.accessory) t.accessory = kw(raw.accessory, ACC_KW) || t.accessory;
+  if (raw.outfit && FACTION_STYLE[raw.outfit]) t.outfitFaction = raw.outfit;
+  else if (raw.outfit) t.outfit = kw(raw.outfit, OUTFIT_KW) || raw.outfit;
+  if (raw.clothing) { t.outfit = kw(raw.clothing, OUTFIT_KW) || 'jacket'; const cf = kw(raw.clothing, [['vantage', 'vantage'], ['lantern', 'lantern']]); if (cf) t.outfitFaction = cf; if (/red/.test(raw.clothing)) t.cloth = '#6a1a1a'; }
+  if (raw.boots) t.boots = raw.boots === 'vantage' ? 'vantage' : ({ street: null, rubber: 'work', waders: 'wrap' })[raw.boots] ?? raw.boots;
+  if (raw.vantageBoots) t.boots = 'vantage';
+  t.nervous = !!raw.nervous; t.verifier = !!raw.verifier;
+  return t;
+}
+
 export function resolveLook(portrait = {}, faction = 'none') {
-  const traits = portrait.traits || {};
+  const traits = normalizeTraits(portrait.traits || {}, faction);
   const r = rng(portrait.seed ?? 1);
-  const f = FACTION_STYLE[traits.faction || faction] ? (traits.faction || faction) : 'none';
-  const fs = FACTION_STYLE[f];
+  const f = traits.faction;
+  const fs = FACTION_STYLE[traits.outfitFaction || f];
   const look = {
     faction: f,
-    form: traits.form || traits.type || 'human',
+    form: traits.form || 'human',
+    nervous: traits.nervous, verifier: traits.verifier,
     head: traits.head || pickR(r, ['oval', 'square', 'long', 'round', 'oval', 'heart']),
-    skin: traits.skin && traits.skin[0] === '#' ? traits.skin : SKINS[typeof traits.skin === 'number' ? traits.skin % SKINS.length : Math.floor(r() * SKINS.length)],
+    skin: pickOr(r, traits.skin, SKINS),
     hair: traits.hair || pickR(r, ['bald', 'buzz', 'mohawk', 'long', 'bob', 'spiky', 'sideshave', 'topknot', 'curly', 'slick', 'buzz', 'bob']),
     hairColor: traits.hairColor || (r() < 0.22 ? pickR(r, HAIRS.slice(7)) : pickR(r, HAIRS.slice(0, 7))),
     eyeColor: pickR(r, EYES),
@@ -63,9 +100,9 @@ export function resolveLook(portrait = {}, faction = 'none') {
     scar: traits.scar ?? (r() < 0.15),
     earring: r() < 0.3,
     glasses: traits.glasses ?? (r() < 0.12),
-    accessory: traits.accessory || factionAccessory(r, f),
+    accessory: traits.accessory !== undefined ? (traits.accessory || 'none') : factionAccessory(r, f),
     outfit: traits.outfit || pickR(r, ['jacket', 'hoodie', 'collar', 'coat', 'vest']),
-    boots: traits.vantageBoots || traits.boots === 'vantage' ? 'vantage' : (traits.boots || pickR(r, ['sneaker', 'wrap', 'work', 'sleek', 'sandal', 'sneaker', 'work'])),
+    boots: traits.boots || pickR(r, f === 'spire' ? ['sleek', 'sleek', 'sneaker'] : ['sneaker', 'wrap', 'work', 'sandal', 'sneaker', 'work']),
     bgSign: pickR(r, ['#ff3fd8', '#2ef6ff', '#b8ff3c', '#ffb547']),
     w: 8 + Math.floor(r() * 3),
     r,
@@ -323,6 +360,8 @@ export function drawPortrait(canvas, portrait = {}, opts = {}) {
     rect(exL - 2, eyeY - 1, 5, 1, '#111'); rect(exR - 2, eyeY - 1, 5, 1, '#111'); px(cx - 1, eyeY - 1, '#111'); px(cx, eyeY - 1, '#111');
     px(exL - 2, eyeY, '#111'); px(exL + 2, eyeY, '#111'); px(exR - 2, eyeY, '#111'); px(exR + 2, eyeY, '#111');
   }
+  if (L.nervous) { const ew = wAt(top + 4); px(cx + ew - 1, top + 4, '#bfe8ff'); px(cx + ew - 1, top + 5, '#8fd0ff'); px(cx - ew + 1, eyeY - 3, '#bfe8ff'); }
+  if (L.verifier) { rect(cx + 13, 36, 2, 10, '#30343f'); rect(cx + 13, 35, 2, 2, '#ff4d6a'); px(cx + 13, 35, '#ffd0d8'); }
   // rim light from neon sign
   ctx.globalAlpha = 0.18; rect(0, 0, S, S, L.bgSign); ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';

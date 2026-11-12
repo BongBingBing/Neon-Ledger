@@ -250,7 +250,7 @@ const POOLS = {
       "Brilliant. You've saved my week.",
       'Cheers. I’ll be back.',
       "Lovely. Stay dry.",
-      'Perfect. Tell your aunt’s ghost I said thanks.',
+      "Perfect. Better than the stall on the Gantry.",
       "Done and done. See you around the stairwell.",
       "You're alright, shopkeeper.",
     ],

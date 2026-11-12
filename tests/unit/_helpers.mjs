@@ -17,7 +17,8 @@ async function tryImport(rel) {
   return import(pathToFileURL(p).href);
 }
 
-export const engine = await tryImport('src/engine/index.js');
+// NL_ENGINE lets the harness be smoke-tested against another implementation (e.g. src/ui/dev/mockEngine.js).
+export const engine = await tryImport(process.env.NL_ENGINE ?? 'src/engine/index.js');
 export const SKIP_ENGINE = engine ? false : 'engine (src/engine/index.js) not present yet';
 
 // Content modules: map of name -> module namespace (or null)

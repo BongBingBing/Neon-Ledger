@@ -81,10 +81,15 @@ export function heatMeter(ctx) {
 /** Customer portrait frame with mood badge; the feet strip shows footwear (a possible tell). */
 export function portraitEl(c, { size = 104, feet = true } = {}) {
   const canvas = h('canvas', { width: 48, height: 48, 'aria-label': `Portrait of ${c.name}` , role: 'img' });
-  const traits = { ...(c.portrait?.traits || {}) };
+  let traits = { ...(c.portrait?.traits || {}) };
+  const npcId = traits.npc || c.npcId;
+  const npc = npcId ? get('npcs', npcId) : null;
+  if (npc?.portraitTraits) traits = { ...npc.portraitTraits, ...traits, faction: traits.faction || npc.faction };
   if (!traits.faction) traits.faction = c.faction;
   const tells = c.visibleTells || [];
   if (tells.some((t) => /boot/i.test(t))) traits.vantageBoots = true;
+  if (tells.includes('nervous')) traits.nervous = true;
+  if (tells.some((t) => /verifier/.test(t))) traits.verifier = true;
   try { drawPortrait(canvas, { ...(c.portrait || {}), traits }, { mood: c.mood, faction: c.faction }); } catch (e) { console.warn(e); }
   const frame = h('div.portrait-frame', { style: size !== 104 ? { width: size + 'px', height: size + 'px' } : null },
     canvas, c.mood ? h('div.mood', { html: moodSvg(c.mood) }) : null);

@@ -3,7 +3,7 @@
 // Fields:
 //   id, name, creds (starting ¢), trade (starting Trade or null)
 //   machines        : machine ids owned at start
-//   capacity        : overrides of starting capacity ({ shelf, storage, stash }); omitted keys use defaults 6/10/0
+//   capacity        : overrides of starting capacity ({ shelf, storage, stash }); omitted keys use defaults 6/10/0; machine effects (floor_cavity stash +2) apply on top
 //   rep             : starting reputation deltas
 //   startInventory  : [{ itemId, qty, location: 'shelf'|'storage'|'stash', condition?, quality?, flags? }]
 //   blurb (short, new-game card), intro (first-morning Feed message), twist (one-line summary)
@@ -66,7 +66,7 @@ const RAW = [
   },
   {
     id: 'fence', name: 'Fence', creds: 350, trade: 'fencing',
-    machines: ['floor_cavity'], capacity: { stash: 2 }, rep: { lantern: 15, vantage: -10 },
+    machines: ['floor_cavity'], capacity: {}, rep: { lantern: 15, vantage: -10 },
     startInventory: [
       { itemId: 'hot_medkit', qty: 1, location: 'stash', flags: { stolen: true } },
       { itemId: 'dry_socks', qty: 2, location: 'shelf' },

@@ -195,7 +195,9 @@ describe('content integrity', () => {
   test('AC-CON-106 dialogue pools: required keys, ≥3 lines, ≤120 chars, known placeholders', { skip: !content.dialogue && 'dialogue.js missing' }, () => {
     const D = contentExport('dialogue', 'DIALOGUE');
     for (const k of ['buyer_greet', 'seller_greet', 'haggle_counter', 'haggle_walk', 'deal_done', 'refuse', 'report', 'undercover_greet', 'ghost_nervous']) {
-      assert.ok(Array.isArray(D[k]) && D[k].length >= 3, `dialogue pool ${k} missing or < 3 lines`);
+      // a pool may be split by outcome (e.g. report_correct / report_wrong)
+      const pools = Array.isArray(D[k]) ? [D[k]] : Object.entries(D).filter(([n]) => n.startsWith(`${k}_`)).map(([, v]) => v);
+      assert.ok(pools.length && pools.every((p) => Array.isArray(p) && p.length >= 3), `dialogue pool ${k} missing or < 3 lines`);
     }
     const bad = [];
     for (const [k, pool] of Object.entries(D)) {

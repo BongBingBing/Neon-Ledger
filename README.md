@@ -2,7 +2,7 @@
 
 An original cyberpunk shopkeeper sim for iPhone, built as an offline web app (PWA).
 
-**Play:** https://bongbingbing.github.io/Is-Stolen/ → open in Safari → Share → **Add to Home Screen**.
+**Play:** https://bongbingbing.github.io/Neon-Ledger/ → open in Safari → Share → **Add to Home Screen**.
 
 - Design: [docs/DESIGN.md](docs/DESIGN.md)
 - Architecture & contracts: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
