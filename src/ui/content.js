@@ -3,7 +3,7 @@
 
 const MODULES = [
   'items', 'brands', 'npcs', 'names', 'dialogue', 'events', 'machines', 'upgrades', 'permits',
-  'licences', 'perks', 'jobs', 'recipes', 'backgrounds', 'difficulties', 'endings', 'feed', 'factions', 'favors',
+  'licences', 'perks', 'jobs', 'recipes', 'backgrounds', 'difficulties', 'endings', 'feed',
 ];
 
 export const C = {};       // C.items -> array/object exported by items.js (first UPPERCASE export)
