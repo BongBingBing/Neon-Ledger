@@ -1,0 +1,12 @@
+#!/bin/sh
+# Runs all tests. Usage: ./tools/test [unit|e2e|all]
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
+MODE="${1:-all}"; RC=0
+if [ "$MODE" = unit ] || [ "$MODE" = all ]; then
+  FILES=$(find tests/unit -name '*.test.mjs' 2>/dev/null)
+  if [ -n "$FILES" ]; then ./tools/node --test $FILES || RC=1; else echo "no unit tests"; fi
+fi
+if [ "$MODE" = e2e ] || [ "$MODE" = all ]; then
+  if ls tests/e2e/test_*.py >/dev/null 2>&1; then .venv/bin/python -m pytest -q tests/e2e || RC=1; else echo "no e2e tests"; fi
+fi
+exit $RC

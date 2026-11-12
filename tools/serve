@@ -1,0 +1,4 @@
+#!/bin/sh
+# Static dev server for the game. Usage: ./tools/serve [port]  (default 8765)
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT" && exec "$ROOT/.venv/bin/python" -m http.server "${1:-8765}" --bind 0.0.0.0

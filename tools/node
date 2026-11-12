@@ -1,0 +1,4 @@
+#!/bin/sh
+# Runs the Node runtime bundled with Playwright (no system Node installed).
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+exec "$ROOT/.venv/lib/python3.13/site-packages/playwright/driver/node" "$@"
