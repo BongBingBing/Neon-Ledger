@@ -1,0 +1,100 @@
+# Neon Ledger originality scan — HARD terms (any hit = blocker finding).
+# Owner: SQA. Sanctioned locations for these strings: docs/DESIGN.md §0 and docs/QA/ only.
+# Format: one term per line, matched case-insensitively as a whole word/phrase
+#   (grep -rniwF -f <(grep -v '^#' docs/QA/forbidden-terms.txt | sed '/^$/d') ...).
+# Lines starting with # are comments.
+
+# --- DESIGN.md §0 (named prior work) ---
+Probably Stolen
+augs
+AI-chip
+AI chip host
+Joe Wild
+Dr. Jackson
+Dr Jackson
+Sawyer
+Lou
+Georgio
+Officer Lun
+Lun
+Serpico
+Eleanor
+Rock Bottom
+Questing Goose
+tinyBuild
+rat breeding
+breed rats
+water purification
+purified water
+water-grade
+space station
+
+# --- Franchise slang / names (cyberpunk RPG) ---
+ripperdoc
+ripper doc
+eddies
+eurodollar
+eurodollars
+netrunner
+netrunners
+netrunning
+choom
+chooms
+preem
+gonk
+Night City
+Arasaka
+Militech
+Kang Tao
+Biotechnica
+Trauma Team
+Tyger Claws
+Voodoo Boys
+Valentinos
+Silverhand
+braindance
+Sandevistan
+Kiroshi
+mantis blades
+Cyberpunk 2077
+
+# --- Tabletop / other cyberpunk franchises ---
+Shadowrun
+nuyen
+chummer
+Renraku
+Saeder-Krupp
+Aztechnology
+Ares Macrotechnology
+Deus Ex
+Sarif
+Tai Yong
+Hengsha
+Blade Runner
+replicant
+replicants
+Tyrell
+Voight-Kampff
+Neuromancer
+Wintermute
+Tessier-Ashpool
+Ono-Sendai
+simstim
+Tachikoma
+cyberbrain
+Ghost in the Shell
+
+# --- Other shop / inspection sims ---
+Papers Please
+Papers, Please
+Arstotzka
+EZIC
+Grestin
+Kolechia
+VA-11 Hall-A
+Karmotrine
+Valenstein
+Glitch City
+Recettear
+Moonlighter
+Rynoka
